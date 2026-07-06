@@ -1,0 +1,43 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  max-width: 640px;
+  margin: 32px auto;
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+form {
+  display: grid;
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 4px;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+  padding: 8px;
+}
+
+textarea {
+  min-height: 96px;
+}
+
+.status.success {
+  color: green;
+}
+
+.status.error {
+  color: red;
+}
