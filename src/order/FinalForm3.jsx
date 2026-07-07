@@ -1,11 +1,7 @@
 import { useState } from "react";
-import { createOrderEmail } from "./emailMessages";
-import { placeOrder, sendOrderEmail } from "./orderApi";
-import { calculateFinalTotal } from "./orderPricing";
-import { validateOrderForm } from "./orderValidation";
 import "./OrderForm.css";
 
-export default function OrderForm() {
+export default function FinalFrom3() {
   const [customerName, setCustomerName] = useState("");
   const [email, setEmail] = useState("");
   const [product, setProduct] = useState("Headphones");
@@ -21,45 +17,128 @@ export default function OrderForm() {
     setMessage("");
     setError("");
 
-    const validationError = validateOrderForm({
-      customerName,
-      email,
-      quantity,
-      couponCode,
-    });
+    console.log("Order form submitted");
 
-    if (validationError) {
-      setError(validationError);
+    // validation inside component
+    if (customerName.trim().length < 2) {
+      setError("Customer name must be at least 2 characters.");
       return;
     }
-    const finalTotal = calculateFinalTotal({
-      product,
-      quantity,
-      couponCode,
-    });
+
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    if (quantity < 1) {
+      setError("Quantity must be at least 1.");
+      return;
+    }
+
+    if (quantity > 5) {
+      setError("You can only order up to 5 items.");
+      return;
+    }
+
+    // business rules inside component
+    let price = 0;
+
+    if (product === "Headphones") {
+      price = 80;
+    }
+
+    if (product === "Keyboard") {
+      price = 120;
+    }
+
+    if (product === "Mouse") {
+      price = 50;
+    }
+
+    let total = price * quantity;
+
+    if (couponCode === "STUDENT20") {
+      total = total * 0.8;
+    }
+
+    if (couponCode === "VIP10") {
+      total = total * 0.9;
+    }
+
+    if (couponCode && couponCode !== "STUDENT20" && couponCode !== "VIP10") {
+      setError("Invalid coupon code.");
+      return;
+    }
+
+    // more business rule inside component
+    let shippingCost = 10;
+
+    if (total >= 100) {
+      shippingCost = 0;
+    }
+
+    const finalTotal = total + shippingCost;
 
     try {
       setLoading(true);
-      const data = await placeOrder({
-        customerName,
-        email,
-        product,
-        quantity,
-        couponCode,
-        total: finalTotal,
-      });
 
-      const orderEmail = createOrderEmail({
-        customerName,
-        product,
-        quantity,
-        finalTotal,
-      });
+      console.log("Sending order to API");
 
-      await sendOrderEmail({
-        to: email,
-        subject: orderEmail.subject,
-        body: orderEmail.body,
+      // API call inside component
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            customerName,
+            email,
+            product,
+            quantity,
+            couponCode,
+            total: finalTotal,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to place order.");
+      }
+
+      const data = await response.json();
+
+      console.log("Order API response:", data);
+
+      // email message logic inside component
+      const emailSubject = `Order placed by ${customerName}`;
+      const emailBody = `
+        Hello ${customerName},
+
+        Your order has been placed successfully.
+
+        Product: ${product}
+        Quantity: ${quantity}
+        Total: €${finalTotal}
+
+        Thank you for shopping with us.
+      `;
+
+      console.log("Sending email with subject:", emailSubject);
+      console.log("Email body:", emailBody);
+
+      // fake email sending inside component
+      await fetch("https://jsonplaceholder.typicode.com/posts", {
+        method: "POST",
+        body: JSON.stringify({
+          to: email,
+          subject: emailSubject,
+          body: emailBody,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       setMessage(`Order placed successfully. Total: €${finalTotal}`);

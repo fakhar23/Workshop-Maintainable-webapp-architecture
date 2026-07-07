@@ -1,16 +1,142 @@
-# React + Vite
+# Order Form Refactoring Workshop
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project starts with one intentionally messy React component:
 
-Currently, two official plugins are available:
+```txt
+src/order/OrderForm.jsx
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The component works, but it has too many responsibilities in one file:
 
-## React Compiler
+- UI rendering
+- React state
+- form validation
+- product pricing
+- coupon discounts
+- shipping calculation
+- API request logic
+- email message creation
+- fake email sending
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The goal is to reorganize the code without changing the behavior.
 
-## Expanding the ESLint configuration
+## Run The App
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## Starting Point
+
+Open:
+
+```txt
+src/order/OrderForm.jsx
+```
+
+Notice that the submit handler contains validation, pricing, API calls, and email message logic directly inside the component.
+
+This is the code students will refactor.
+
+## Target Structure
+
+Refactor the code into this structure:
+
+```txt
+src/order/
+  OrderForm.jsx
+  OrderForm.css
+  orderValidation.js
+  orderPricing.js
+  orderApi.js
+  emailMessages.js
+```
+
+## Step 1: Move Validation
+
+Create:
+
+```txt
+src/order/orderValidation.js
+```
+
+Move the form validation logic into:
+
+```js
+validateOrderForm()
+```
+
+`OrderForm.jsx` should call this function instead of keeping validation rules inside the component.
+
+## Step 2: Move Pricing Logic
+
+Create:
+
+```txt
+src/order/orderPricing.js
+```
+
+Move product prices, coupon discounts, shipping, and final total logic into:
+
+```js
+getProductPrice()
+calculateDiscountedTotal()
+calculateShippingCost()
+calculateFinalTotal()
+```
+
+`OrderForm.jsx` should only ask for the final total.
+
+## Step 3: Move API Logic
+
+Create:
+
+```txt
+src/order/orderApi.js
+```
+
+Move the two fake network requests into:
+
+```js
+placeOrder()
+sendOrderEmail()
+```
+
+The component should not contain `fetch(...)` calls anymore.
+
+## Step 4: Move Email Message Creation
+
+Create:
+
+```txt
+src/order/emailMessages.js
+```
+
+Move the email subject and body formatting into:
+
+```js
+createOrderEmail()
+```
+
+`OrderForm.jsx` should not build the email string directly.
+
+## Final Goal
+
+At the end, `OrderForm.jsx` should mostly contain:
+
+- React state
+- submit flow
+- JSX markup
+- calls to helper functions
+
+The business rules and side effects should live in separate files.
+
+## Principles Practiced
+
+- DRY: avoid repeating business/API patterns
+- KISS: keep each piece simple
+- Encapsulation: hide internal details behind functions
+- High cohesion: keep related logic together
+- Low coupling: avoid making the React component know everything
+- Pure functions: make business rules easy to reuse and test
