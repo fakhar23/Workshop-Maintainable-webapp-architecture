@@ -1,16 +1,97 @@
-# React + Vite
+# Sentry React Workshop
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This demo is a small ecommerce-flavored React app for testing Sentry:
 
-Currently, two official plugins are available:
+- console output
+- product API network calls
+- handled errors
+- unhandled render crashes
+- session replay
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Step 0: Env Setup
 
-## React Compiler
+Rename `.env.example` to `.env`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+mv .env.example .env
+```
 
-## Expanding the ESLint configuration
+Create your own Sentry account, create a new React project in Sentry, and copy your DSN client key into `.env`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+It should look something like this:
+
+```env
+VITE_SENTRY_DSN=https://69e2a73b3336689e4e301f8b56b0d138@o4511689881878529.ingest.de.sentry.io/4511689887907920
+VITE_SENTRY_ENVIRONMENT=development
+```
+
+Then run:
+
+```bash
+npm install
+npm run dev
+```
+
+## Step 1: Add Sentry To `main.jsx`
+
+Import Sentry at the top of `src/main.jsx`.
+
+```js
+import * as Sentry from "@sentry/react";
+```
+
+Add this code before `createRoot(...)`.
+
+```js
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || "development",
+  debug: true,
+
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration({
+      maskAllText: false,
+      blockAllMedia: false,
+      networkDetailAllowUrls: [/.*/],
+    }),
+  ],
+
+  tracesSampleRate: 1.0,
+  replaysSessionSampleRate: 1.0,
+  replaysOnErrorSampleRate: 1.0,
+});
+```
+
+## Step 2: Add The Error Boundary
+
+In `src/main.jsx`, wrap `<App />` with `Sentry.ErrorBoundary`.
+
+Change this:
+
+```jsx
+<StrictMode>
+  <App />
+</StrictMode>
+```
+
+To this:
+
+```jsx
+<StrictMode>
+  <Sentry.ErrorBoundary fallback={<p>Something went wrong.</p>}>
+    <App />
+  </Sentry.ErrorBoundary>
+</StrictMode>
+```
+
+## Step 3: Test The Buttons
+
+Use the app buttons:
+
+- `🖥️ Write console.log`: creates console output
+- `🌐 Load product details`: creates a network request
+- `🎟️ Load expired coupon`: sends a handled error
+- `💥 Crash Product Details`: throws an unhandled render error
+
+Then check the issue in Sentry for breadcrumbs, replay, tags, network activity, and environment.
