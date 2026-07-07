@@ -1,5 +1,26 @@
 import { useState } from "react";
-import { sendEmail } from "../services/emailService";
+
+// Step 1: this Resend-specific email function is duplicated in both page files on purpose.
+async function sendEmailWithResend({ to, subject, body }) {
+  const response = await fetch("/api/resend/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: import.meta.env.VITE_RESEND_FROM_EMAIL || "onboarding@resend.dev",
+      to,
+      subject,
+      html: body,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Resend request failed.");
+  }
+}
 
 function ContactSupportPage() {
   const [recipientEmail, setRecipientEmail] = useState(
@@ -18,7 +39,7 @@ function ContactSupportPage() {
     setMessageType("");
 
     try {
-      await sendEmail({
+      await sendEmailWithResend({
         to: recipientEmail,
         subject: `Support request from ${personName}`,
         body: `<p>${emailBody}</p>`,
