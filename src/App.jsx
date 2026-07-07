@@ -1,5 +1,7 @@
+import OrderForm from "./order/OrderForm";
+
 function App() {
-  return <h1>Welcome to worksop</h1>
+  return <OrderForm />;
 }
 
-export default App
+export default App;

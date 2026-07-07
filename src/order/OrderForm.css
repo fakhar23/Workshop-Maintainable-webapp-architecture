@@ -1,0 +1,33 @@
+.order-page {
+  max-width: 520px;
+  margin: 40px auto;
+  font-family: Arial, sans-serif;
+}
+
+.order-alert {
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.order-alert-error {
+  background: #ffe5e5;
+}
+
+.order-alert-success {
+  background: #e7ffe5;
+}
+
+.order-field {
+  margin-bottom: 12px;
+}
+
+.order-field input,
+.order-field select {
+  display: block;
+  width: 100%;
+  padding: 8px;
+}
+
+.order-page button {
+  padding: 10px 16px;
+}
