@@ -34,6 +34,8 @@ npm run dev
 
 ## Step 1: Add Sentry To `main.jsx`
 
+Follow the `TODO` comments in `src/main.jsx`.
+
 Import Sentry at the top of `src/main.jsx`.
 
 ```js
@@ -64,6 +66,8 @@ Sentry.init({
 ```
 
 ## Step 2: Add The Error Boundary
+
+Follow the `TODO` comment around `<App />` in `src/main.jsx`.
 
 In `src/main.jsx`, wrap `<App />` with `Sentry.ErrorBoundary`.
 
