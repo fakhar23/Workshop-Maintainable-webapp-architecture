@@ -15,6 +15,8 @@ The app has two pages:
 
 Both pages can send an email. At the start, both pages contain the same duplicated Resend email-sending code.
 
+Look for the `TODO` comments in the source files. They mark the exact places students should change during the exercise.
+
 ## Step 0: Set Up Env
 
 Rename `.env.example` to `.env`.
@@ -54,6 +56,8 @@ Open `src/services/emailService.js`.
 
 Move the duplicated `sendEmailWithResend` function from the page files into this service file.
 
+There is a `TODO` in `emailService.js` showing where this shared function should go.
+
 The service should export it:
 
 ```js
@@ -84,6 +88,13 @@ Then import it in both pages:
 ```js
 import { sendEmailWithResend } from "../services/emailService";
 ```
+
+Remove the duplicated local `sendEmailWithResend` function from:
+
+- `src/pages/PlaceOrderPage.jsx`
+- `src/pages/ContactSupportPage.jsx`
+
+The `TODO` comments above the duplicated functions point to this step.
 
 The pages should still call:
 
@@ -145,6 +156,8 @@ Update both pages to import:
 ```js
 import { sendEmail } from "../services/emailService";
 ```
+
+The `TODO` comments above the call sites in both pages point to this step.
 
 And call:
 

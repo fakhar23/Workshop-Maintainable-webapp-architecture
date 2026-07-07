@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+// TODO: Step 2 - move this whole function into src/services/emailService.js.
 // Step 1: this Resend-specific email function is duplicated in both page files on purpose.
 async function sendEmailWithResend({ to, subject, body }) {
   const response = await fetch("/api/resend/emails", {
@@ -39,6 +40,8 @@ function PlaceOrderPage() {
     setMessageType("");
 
     try {
+      // TODO: Step 2 - after moving the function, import it from the service file.
+      // TODO: Step 3 - later, rename this call to a generic sendEmail wrapper.
       await sendEmailWithResend({
         to: recipientEmail,
         subject: `Order placed by ${personName}`,
